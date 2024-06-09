@@ -6,7 +6,7 @@ This is 8080 machine disassembler C code.
 #include<stdlib.h>
 
 
-#define OPENFILE "spaceInv.hex"
+#define OPENFILE "invaders.h"
 #define BYTE 1
 
 /**
@@ -270,7 +270,7 @@ switch(*opcode){
 	case 0xF2:	printf("JP 0x%02x%02x", opcode[2] ,opcode[1]); opbyte = 3; break;
 	case 0xF3:	printf("DI"); break;
 	case 0xF4:	printf("CP 0x%02x%02x", opcode[2] ,opcode[1]); opbyte = 3; break;
-	case 0xF5:	printf("PUSH PSW");
+	case 0xF5:	printf("PUSH PSW"); break;
 	case 0xF6:	printf("ORI 0x%02x", opcode[1]); opbyte = 2; break;
 	case 0xF7:	printf("RST 6"); break;
 	case 0xF8:	printf("RM"); break;
