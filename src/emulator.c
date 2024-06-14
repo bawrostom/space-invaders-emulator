@@ -1,7 +1,9 @@
 #include<stdio.h>
 #include<stdint.h>
+#include <stdlib.h>
 
-
+#define COUNT 20
+#define BYTE 1
 
 uint8_t parityCount(uint8_t a){
 	int count = 0;
@@ -198,11 +200,134 @@ switch(*opcode){
 	case 0x20:
 		printf("NOT DEFINED");
 		break;
-
-
+	case 0x21:
+		state->h = opcode[2];
+		state->l = opcode[1];
+		state->pc += 2;
+		break;
+	case 0x22:
+		state->memory[(opcode[2] << 8 | opcode[1])] = state->l;
+		state->memory[(opcode[2] << 8 | opcode[1])+1] = state->h;
+		state->pc += 2;
+		break;
+	case 0x23:
+		state->h += (state->l++) == 0;
+		break;
+	case 0x24:
+		state->h++;
+		state->flag.z = (state->h) == 0;
+		state->flag.c = (state->h) == 0;
+		state->flag.s = (state->h & 0x80) != 0;
+		state->flag.p = parityCount(state->h) % 2;
+		break;
+	case 0x25:
+		state->h--;
+		state->flag.z = (state->h) == 0;
+		state->flag.ac = (state->h) == UINT8_MAX;
+		state->flag.s = (state->h & 0x80) != 0;
+		state->flag.p = parityCount(state->h) % 2;
+		break;
+	case 0x26:
+		state->h = opcode[1];
+		state->pc++;
+		break;
+	case 0x27:
+		break;
+	case 0x28:
+		printf("NOT DEFINED");
+		break;
+	case 0x29:
+		state->flag.c = (state->h + state->h + ((state->l+state->l) >> 8)) >> 8;
+		state->l = state->l + state->l;
+		state->h = state->h + state->h + ((state->l + state->l) >> 8);
+		break;
+	case 0x2A:
+		state->l = state->memory[(opcode[2] << 8 | opcode[1])];
+		state->h = state->memory[(opcode[2] << 8 | opcode[1])+1];
+		state->pc += 2;
+		break;
+	case 0x2B:
+		state->h -= (state->l--) == UINT8_MAX;
+		break;
+	case 0x2C:
+		state->l++;
+		state->flag.z = (state->l) == 0;
+		state->flag.c = (state->l) == 0;
+		state->flag.s = (state->l & 0x80) != 0;
+		state->flag.p = parityCount(state->l) % 2;
+		break;
+	case 0x2D:
+		state->l--;
+		state->flag.z = (state->l) == 0;
+		state->flag.ac = (state->l) == UINT8_MAX;
+		state->flag.s = (state->l & 0x80) != 0;
+		state->flag.p = parityCount(state->l) % 2;
+		break;
+	case 0x2E:
+		state->l = opcode[1];
+		state->pc++;
+		break;
+	case 0x2F:
+		state->a = ~state->a;
+		break;
+	case 0x30:
+		printf("NOT DEFINED");
+		break;
 }
+}
+
+void validate(){
+	
+
+	uint8_t *buffer = malloc(sizeof(uint8_t) * 3);
+
+	scanf("Enter the first opcode: %x", buffer[0]);
+	scanf("Enter the first opcode: %x", buffer[1]);
+	scanf("Enter the first opcode: %x", buffer[2]);
+
+	state8080 state = {
+	.a=0,
+	.b=0,
+	.c=0,
+	.d=0,
+	.e=0,
+	.h=0,
+	.l=0,
+	.pc=0,
+	.sp=0,
+	.flag={0},
+	.memory=buffer,
+	.int_enable=0
+	};
+	
+	emulate8080(&state);
 }
 
 int main(){
+
+	state8080 *state;
+	state = malloc(sizeof(state8080));
+	uint8_t *buffer = malloc(sizeof(uint8_t) * 20);
 	
+	FILE *fd = fopen("file","r");
+	
+	if ( fd == NULL ){
+		perror("Failed opening file\n");
+		return 1;
+	}
+	
+	fread(buffer, BYTE, COUNT,fd);
+	fclose(fd);
+
+	state->memory = buffer;
+	
+	for(int i=0; i<20; i++){
+		printf("buffer[%d]= %x \n", i,buffer[i]);
+	}
+
+	emulate8080(state);
+
+	free(buffer);
+	return 0;
+
 }
