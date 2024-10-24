@@ -284,36 +284,37 @@ switch(*opcode){
 
 	default  :	printf("opcode not found check your disassembeler\n");
 
-}
-printf("\n");
-return opbyte;
+}	printf("\n");
+	return opbyte;
+	printf("\n");
+	return opbyte;
 }
 
 
 int main(){
 
-int pc = 0;
-FILE *fd = fopen(OPENFILE,"r");
+	int pc = 0;
+	FILE *fd = fopen(OPENFILE,"r");
 
-if (fd == NULL){
-	perror("Error while file opening");
-	return 1;
-}
+	if (fd == NULL){
+		perror("Error while file opening");
+		return 1;
+	}
 
-// Get the file size
-fseek(fd, 0L, SEEK_END);
-int fsize = ftell(fd);
-fseek(fd, 0L, SEEK_SET);
+	// Get the file size
+	fseek(fd, 0L, SEEK_END);
+	int fsize = ftell(fd);
+	fseek(fd, 0L, SEEK_SET);
 
-unsigned char *codeBuffer = malloc(fsize);
+	unsigned char *codeBuffer = malloc(fsize);
 
-fread(codeBuffer, BYTE, fsize, fd);
-fclose(fd);
+	fread(codeBuffer, BYTE, fsize, fd);
+	fclose(fd);
 
-while (pc < fsize){
-	pc += disass8080(codeBuffer, pc);
-}
+	while (pc < fsize){
+		pc += disass8080(codeBuffer, pc);
+	}
 
-free(codeBuffer);
-return 0;
+	free(codeBuffer);
+	return 0;
 }
